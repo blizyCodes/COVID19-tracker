@@ -1,8 +1,8 @@
 import axios from "axios";
 
-//for accurate real-time data. It updates more frequently on the day.
+//for accurate real-time data. It updates more frequently on the day. ***used to be https://corona.lmao.ninja/v3/covid-19 changed 06/07/22****
 const covidWorldOMetersApi = axios.create({
-  baseURL: "https://corona.lmao.ninja/v3/covid-19",
+  baseURL: "https://disease.sh/v3/covid-19",
 });
 
 //for historical data, original API had data for last 3 days only.
