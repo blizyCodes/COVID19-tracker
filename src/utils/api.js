@@ -6,20 +6,24 @@ const covidJHUApi = axios.create({
 
 export const getDailyDataTotals = async (country) => {
   if (country === "all") {
-    const {
-      data: { cases, deaths },
-    } = await covidJHUApi.get(`/historical/${country}`);
+    const [
+      {
+        data: { cases, deaths },
+      },
+      {
+        data: { recovered: recoveredTotal },
+      },
+    ] = await Promise.all([
+      covidJHUApi.get(`/historical/${country}`),
+      covidJHUApi.get(`/${country}`),
+    ]);
+
     const dates = Object.keys(cases);
     const lastUpdated = dates[dates.length - 1];
     const dailyCasesTotal = Object.values(cases);
     const lastDailyCasesTotal = dailyCasesTotal[dailyCasesTotal.length - 1];
     const dailyDeathsTotal = Object.values(deaths);
     const lastDailyDeathsTotal = dailyDeathsTotal[dailyDeathsTotal.length - 1];
-
-    const {
-      data: { recovered },
-    } = await covidJHUApi.get(`/${country}`);
-    const recoveredTotal = recovered;
     return {
       dates,
       lastUpdated,
@@ -30,6 +34,7 @@ export const getDailyDataTotals = async (country) => {
       recoveredTotal,
     };
   }
+
   const {
     data: {
       timeline: { cases, deaths },
