@@ -4,6 +4,7 @@ import styles from "./App.module.css";
 import { useState, useEffect } from "react";
 import { getDailyDataTotals } from "./utils/api";
 import banner from "./utils/covid-banner.jpg";
+
 function App() {
   const [dates, setDates] = useState([]);
   const [cases, setCases] = useState([]);
@@ -12,12 +13,11 @@ function App() {
 
   useEffect(() => {
     const getDailyForChart = async () => {
-      const { dates, dailyCasesTotal, dailyDeaths } = await getDailyDataTotals(
-        chosenCountry
-      );
+      const { dates, dailyCasesTotal, dailyDeathsTotal } =
+        await getDailyDataTotals(chosenCountry);
       setDates(dates);
       setCases(dailyCasesTotal);
-      setDeaths(dailyDeaths);
+      setDeaths(dailyDeathsTotal);
     };
     getDailyForChart();
   }, [chosenCountry]);

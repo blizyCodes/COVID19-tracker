@@ -2,22 +2,25 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { Typography, Grid } from "@mui/material";
 import styles from "./Cards.module.css";
-import { getCardsData } from "../../utils/api";
+import { getDailyDataTotals } from "../../utils/api";
 import { SingleCard } from "./SingleCard";
 
 const Cards = ({ chosenCountry }) => {
   const [totalData, setTotalData] = useState({});
+  const [recovered, setRecovered] = useState(0);
   useEffect(() => {
     const getTotal = async () => {
-      const data = await getCardsData(chosenCountry);
-
+      const data = await getDailyDataTotals(chosenCountry);
       setTotalData(data);
+      setRecovered(data.recoveredTotal);
+      // const recoveredData = await getRecoveredData(chosenCountry);
+      // setRecovered(recoveredData.recovered);
     };
 
     getTotal();
   }, [chosenCountry]);
 
-  return totalData.cases ? (
+  return totalData.lastDailyCasesTotal ? (
     <div className={styles.container}>
       <Typography pb={2} variant="h4" component="h2" gutterBottom>
         {chosenCountry !== "all" ? chosenCountry : "All Countries"}
@@ -26,23 +29,23 @@ const Cards = ({ chosenCountry }) => {
         <SingleCard
           title="Infected"
           subtitle="Number of COVID-19 cases"
-          lastUpdate={totalData.updated}
+          lastUpdate={totalData.lastUpdated}
           className={styles.infected}
-          endValue={totalData.cases}
+          endValue={totalData.lastDailyCasesTotal}
         />
         <SingleCard
           title="Casualties"
           subtitle="Number of deaths from COVID 19"
-          lastUpdate={totalData.updated}
+          lastUpdate={totalData.lastUpdated}
           className={styles.deaths}
-          endValue={totalData.deaths}
+          endValue={totalData.lastDailyDeathsTotal}
         />
         <SingleCard
           title="Recovered"
           subtitle="Number of recoveries from COVID-19 (if reported)"
-          lastUpdate={totalData.updated}
+          lastUpdate={totalData.lastUpdated}
           className={styles.recovered}
-          endValue={totalData.recovered}
+          endValue={recovered}
         />
       </Grid>
     </div>
