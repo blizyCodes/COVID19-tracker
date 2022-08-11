@@ -1,64 +1,47 @@
 import axios from "axios";
 
-const covidJHUApi = axios.create({
-  baseURL: "https://disease.sh/v3/covid-19",
-});
+const api = "https://disease.sh/v3/covid-19"
 
 export const getDailyDataTotals = async (country) => {
+  let casesData;
+  let deathsData;
+  let recoveredData;
+
   if (country === "all") {
-    const [
-      {
-        data: { cases, deaths },
-      },
-      {
-        data: { recovered: recoveredTotal },
-      },
-    ] = await Promise.all([
-      covidJHUApi.get(`/historical/${country}`),
-      covidJHUApi.get(`/${country}`),
+    const [ {data: { cases, deaths }}, {data: { recovered }} ] = await Promise.all([
+      axios.get(`${api}/historical/all`),
+      axios.get(`${api}/all`),
     ]);
 
-    const dates = Object.keys(cases);
-    const lastUpdated = dates[dates.length - 1];
-    const dailyCasesTotal = Object.values(cases);
-    const lastDailyCasesTotal = dailyCasesTotal[dailyCasesTotal.length - 1];
-    const dailyDeathsTotal = Object.values(deaths);
-    const lastDailyDeathsTotal = dailyDeathsTotal[dailyDeathsTotal.length - 1];
-    return {
-      dates,
-      lastUpdated,
-      dailyCasesTotal,
-      lastDailyCasesTotal,
-      dailyDeathsTotal,
-      lastDailyDeathsTotal,
-      recoveredTotal,
-    };
+    casesData = cases;
+    deathsData = deaths;
+    recoveredData = recovered;
+
+  } else {
+
+    const [{data: {timeline: { cases, deaths }}},{data: { recovered }},
+    ] = await Promise.all([
+      axios.get(`${api}/historical/${country}`),
+      axios.get(`${api}/countries/${country}`),
+    ]);
+
+    casesData = cases;
+    deathsData = deaths;
+    recoveredData = recovered;
   }
 
-  const {
-    data: {
-      timeline: { cases, deaths },
-    },
-  } = await covidJHUApi.get(`/historical/${country}`);
-
-  const dates = Object.keys(cases);
+  const dates = Object.keys(casesData);
   const lastUpdated = dates[dates.length - 1];
-  const dailyCasesTotal = Object.values(cases);
+  const dailyCasesTotal = Object.values(casesData);
   const lastDailyCasesTotal = dailyCasesTotal[dailyCasesTotal.length - 1];
-  const dailyDeathsTotal = Object.values(deaths);
+  const dailyDeathsTotal = Object.values(deathsData);
   const lastDailyDeathsTotal = dailyDeathsTotal[dailyDeathsTotal.length - 1];
-  return {
-    dates,
-    lastUpdated,
-    dailyCasesTotal,
-    lastDailyCasesTotal,
-    dailyDeathsTotal,
-    lastDailyDeathsTotal,
-  };
+
+  return { dates, lastUpdated, dailyCasesTotal, lastDailyCasesTotal, dailyDeathsTotal, lastDailyDeathsTotal, recoveredData};
 };
 
 export const getCountries = async () => {
-  const { data } = await covidJHUApi.get("/jhucsse");
+  const { data } = await axios.get(`${api}/jhucsse`);
   const countriesList = [];
   data.forEach((countryData) => {
     if (countriesList.indexOf(countryData.country) === -1)

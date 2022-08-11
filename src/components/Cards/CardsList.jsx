@@ -12,7 +12,7 @@ const Cards = ({ chosenCountry }) => {
     const getTotal = async () => {
       const data = await getDailyDataTotals(chosenCountry);
       setTotalData(data);
-      setRecovered(data.recoveredTotal);
+      setRecovered(data.recoveredData);
       // const recoveredData = await getRecoveredData(chosenCountry);
       // setRecovered(recoveredData.recovered);
     };
